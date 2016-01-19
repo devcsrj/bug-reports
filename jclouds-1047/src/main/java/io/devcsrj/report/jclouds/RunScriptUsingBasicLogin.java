@@ -1,15 +1,10 @@
 package io.devcsrj.report.jclouds;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 import static org.jclouds.compute.options.RunScriptOptions.Builder.nameTask;
-import static org.jclouds.compute.options.RunScriptOptions.Builder.wrapInInitScript;
 
 import java.util.Set;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.jclouds.ContextBuilder;
 import org.jclouds.compute.ComputeService;
@@ -108,32 +103,9 @@ public class RunScriptUsingBasicLogin {
         // BaseComputeServiceLiveTest#weCanCancelTask
         ListenableFuture<ExecResponse> future = client.submitScriptOnNode(node.getId(), "sleep 300",
                 nameTask("sleeper").runAsRoot(false));
-
-        ExecResponse response = null;
-        try {
-            response = future.get(1, TimeUnit.MILLISECONDS);
-            checkState(false, "future.get() should've thrown TimeoutException");
-        } catch (TimeoutException e) {
-            assert !future.isDone();
-            checkState(!future.isDone(), "future.isDone()");
-
-            response = client.runScriptOnNode(node.getId(), "/tmp/init-sleeper status",
-                    wrapInInitScript(false).runAsRoot(false));
-            checkArgument(!response.getOutput().trim().equals(""));
-
-            // Issue fails here
-            future.cancel(true);
-
-            response = client.runScriptOnNode(node.getId(), "/tmp/init-sleeper status",
-                    wrapInInitScript(false).runAsRoot(false));
-            checkArgument(response.getOutput().trim().equals(""));
-            try {
-                future.get();
-                checkState(false, "future.get() should've thrown CancellationException");
-            } catch (CancellationException e1) {
-
-            }
-        }
+        checkState(!future.isDone(), "future.isDone()");
+        future.cancel(true);
+        checkState(future.isCancelled(), "future.isCancelled()");
     }
 
 }
