@@ -3,7 +3,7 @@ package io.devcsrj.jackson;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize( builder = AutoValue_EndpointImpl.Builder.class )
+@JsonDeserialize( builder = EndpointImpl.Builder.class )
 public abstract class EndpointImpl extends Endpoint {
 
     public static Builder builder() {
