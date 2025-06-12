@@ -1,38 +1,38 @@
-# sv
+To run:
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
-
-## Creating a project
-
-If you're seeing this, you've probably already done this step. Congrats!
-
-```bash
-# create a new project in the current directory
-npx sv create
-
-# create a new project in my-app
-npx sv create my-app
 ```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
 ```
 
-## Building
+Visit [localhost:5173](http://localhost:5173).
 
-To create a production version of your app:
+* Notice that the UI updates based on the server time.
+* Refresh the page
 
-```bash
-npm run build
+The server will crash with:
+
+```
+node:internal/process/promises:392
+      new UnhandledPromiseRejection(reason);
+      ^
+
+UnhandledPromiseRejection: This error originated either by throwing inside of an async function without a catch block, or by rejecting a promise which was not handled with .catch(). The promise rejected with the reason "undefined".
+    at throwUnhandledRejectionsMode (node:internal/process/promises:392:7)
+    at processPromiseRejections (node:internal/process/promises:475:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:106:32) {
+  code: 'ERR_UNHANDLED_REJECTION'
+}
+
+Node.js v22.11.0
 ```
 
-You can preview the production build with `npm run preview`.
+Technically can be prevented with:
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+```ts
+process.on('unhandledRejection', (reason) => {
+	console.error(`Failed; ${new Date()}`)
+	console.error('Unhandled Rejection (global):', reason);
+});
+```
+
+But the session will keep running behind the scenes (e.g.: the handler printing `Failed` in the console)
